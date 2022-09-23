@@ -26,6 +26,10 @@ namespace GameServer.Maps
             }
         }
 
+        public string TemporalCode { get; set; }
+
+        public Action OnVerifyCode { get; set; }
+
 
         public byte 交易状态
         {
@@ -224,8 +228,8 @@ namespace GameServer.Maps
             // unknown
             ActiveConnection.SendRaw(177, 4, new byte[] { 24, 0 });
 
-            // Send Progress (unlock second tab skills)
-            var buff = new byte[] { 6, 0, 0, 0, 5, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 3, 0, 0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 4, 0, 0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 5, 0, 0, 0, 255, 255, 255, 255 };
+            // Send Progress (unlock talent system)
+            var buff = new byte[68] { 6, 0, 0, 0, 5, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 3, 0, 0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 4, 0, 0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 5, 0, 0, 0, 255, 255, 255, 255 };
             Array.Copy(BitConverter.GetBytes(ObjectId), 0, buff, 0, 4);
             ActiveConnection.SendRaw(359, 70, buff);
 
@@ -235,7 +239,7 @@ namespace GameServer.Maps
             网络连接.SendPacket(new SyncSupplementaryVariablesPacket
             {
                 变量类型 = 1,
-                对象编号 = this.ObjectId,
+                对象编号 = ObjectId,
                 变量索引 = 112,
                 变量内容 = ComputingClass.TimeShift(CharacterData.补给日期.V)
             });
@@ -243,7 +247,7 @@ namespace GameServer.Maps
             网络连接.SendPacket(new SyncSupplementaryVariablesPacket
             {
                 变量类型 = 1,
-                对象编号 = this.ObjectId,
+                对象编号 = ObjectId,
                 变量索引 = 975,
                 变量内容 = ComputingClass.TimeShift(CharacterData.战备日期.V)
             });
@@ -253,7 +257,7 @@ namespace GameServer.Maps
                 变量类型 = 1,
                 对象编号 = this.ObjectId,
                 变量索引 = 50, // unlock awekening skills tab
-                变量内容 = ComputingClass.TimeShift(CharacterData.补给日期.V)
+                变量内容 = 3616,
             });
 
             // unknown
@@ -356,17 +360,6 @@ namespace GameServer.Maps
             //        变量内容 = sup.Value
             //    });
             //}
-
-            for (ushort i = 1; i <= 1500; i++)
-            {
-                网络连接.SendPacket(new SyncSupplementaryVariablesPacket
-                {
-                    变量类型 = 1,
-                    对象编号 = this.ObjectId,
-                    变量索引 = i,
-                    变量内容 = 1
-                });
-            }
 
             // unknown (stat updater)
             ActiveConnection.SendRaw(221, 10, new byte[] { 47, 0, 0, 0, 0, 0, 0, 0 });
@@ -662,6 +655,70 @@ namespace GameServer.Maps
             }
 
             return null;
+        }
+
+        public void RequestLockStorage(bool enabled)
+        {
+            if (enabled == CharacterData.WarehouseLocked.V)
+            {
+                ActiveConnection?.SendPacket(new SyncWarehouseLockedPacket
+                {
+                    Enabled = CharacterData.WarehouseLocked.V
+                });
+                return;
+            }
+
+            RequestVerificationCode(() =>
+            {
+                CharacterData.WarehouseLocked.V = enabled;
+
+                ActiveConnection?.SendPacket(new SyncWarehouseLockedPacket
+                {
+                    Enabled = CharacterData.WarehouseLocked.V
+                });
+            });
+        }
+
+        public void RequestVerificationCode(Action callback)
+        {
+            TemporalCode = ComputingClass.RandomString(6);
+            OnVerifyCode = callback;
+            MainProcess.AddSystemLog($"Secure random lock code for character: {TemporalCode}");
+            ActiveConnection?.SendPacket(new GameErrorMessagePacket
+            {
+                错误代码 = 292, // Request Code
+            });
+        }
+
+        public void VerifyTaskMessageCode(string code)
+        {
+            if (string.IsNullOrEmpty(TemporalCode) || TemporalCode != code)
+            {
+                // TODO: we need gameerror packet
+                return;
+            }
+
+            SendPacket(new 社交错误提示
+            {
+                错误编号 = 293
+            });
+
+            if (OnVerifyCode != null)
+            {
+                try
+                {
+                    OnVerifyCode();
+                }
+                catch (Exception ex)
+                {
+                    MainProcess.AddSystemLog($"[EXCEPTION] An error ocurred verifing code: {ex.ToString()}");
+                    throw ex;
+                }
+                finally
+                {
+                    OnVerifyCode = null;
+                }
+            }
         }
 
         public void CompleteQuest(int questId)
@@ -2648,6 +2705,7 @@ namespace GameServer.Maps
 
         public MonitorDictionary<byte, ItemData> Backpack => CharacterData.Backpack;
         public MonitorDictionary<byte, ItemData> Warehouse => CharacterData.Warehouse;
+        public DataMonitor<bool> WarehouseLocked => CharacterData.WarehouseLocked;
         public MonitorDictionary<byte, ItemData> ExtraBackpack => CharacterData.ExtraBackPack;
         public MonitorDictionary<byte, EquipmentData> Equipment => CharacterData.Equipment;
 

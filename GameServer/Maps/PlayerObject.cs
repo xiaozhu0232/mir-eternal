@@ -26,6 +26,10 @@ namespace GameServer.Maps
             }
         }
 
+        public string TemporalCode { get; set; }
+
+        public Action OnVerifyCode { get; set; }
+
 
         public byte 交易状态
         {
@@ -224,10 +228,18 @@ namespace GameServer.Maps
             // unknown
             ActiveConnection.SendRaw(177, 4, new byte[] { 24, 0 });
 
+            // Send Progress (unlock talent system)
+            var buff = new byte[68] { 6, 0, 0, 0, 5, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 3, 0, 0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 4, 0, 0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 5, 0, 0, 0, 255, 255, 255, 255 };
+            Array.Copy(BitConverter.GetBytes(ObjectId), 0, buff, 0, 4);
+            ActiveConnection.SendRaw(359, 70, buff);
+
+            // Dragon System Guard (we need unpack packet)
+            ActiveConnection.SendRaw(323, 0, new byte[] { 1, 8, 0, 232, 174, 176, 229, 189, 149, 49, 0, 0, 0, 0, 0, 0, 232, 174, 176, 229, 189, 149, 50, 0, 0, 0, 0, 0, 0, 232, 174, 176, 229, 189, 149, 51, 0, 0, 0, 0, 0, 0, 232, 174, 176, 229, 189, 149, 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+
             网络连接.SendPacket(new SyncSupplementaryVariablesPacket
             {
                 变量类型 = 1,
-                对象编号 = this.ObjectId,
+                对象编号 = ObjectId,
                 变量索引 = 112,
                 变量内容 = ComputingClass.TimeShift(CharacterData.补给日期.V)
             });
@@ -235,9 +247,17 @@ namespace GameServer.Maps
             网络连接.SendPacket(new SyncSupplementaryVariablesPacket
             {
                 变量类型 = 1,
-                对象编号 = this.ObjectId,
+                对象编号 = ObjectId,
                 变量索引 = 975,
                 变量内容 = ComputingClass.TimeShift(CharacterData.战备日期.V)
+            });
+
+            网络连接.SendPacket(new SyncSupplementaryVariablesPacket
+            {
+                变量类型 = 1,
+                对象编号 = this.ObjectId,
+                变量索引 = 50, // unlock awekening skills tab
+                变量内容 = 3616,
             });
 
             // unknown
@@ -330,16 +350,16 @@ namespace GameServer.Maps
                 { 975, 0 },
             };
 
-            foreach (var sup in supplementaryIds1)
-            {
-                网络连接.SendPacket(new SyncSupplementaryVariablesPacket
-                {
-                    变量类型 = 1,
-                    对象编号 = this.ObjectId,
-                    变量索引 = sup.Key,
-                    变量内容 = sup.Value
-                });
-            }
+            //foreach (var sup in supplementaryIds1)
+            //{
+            //    网络连接.SendPacket(new SyncSupplementaryVariablesPacket
+            //    {
+            //        变量类型 = 1,
+            //        对象编号 = this.ObjectId,
+            //        变量索引 = sup.Key,
+            //        变量内容 = sup.Value
+            //    });
+            //}
 
             // unknown (stat updater)
             ActiveConnection.SendRaw(221, 10, new byte[] { 47, 0, 0, 0, 0, 0, 0, 0 });
@@ -637,6 +657,70 @@ namespace GameServer.Maps
             return null;
         }
 
+        public void RequestLockStorage(bool enabled)
+        {
+            if (enabled == CharacterData.WarehouseLocked.V)
+            {
+                ActiveConnection?.SendPacket(new SyncWarehouseLockedPacket
+                {
+                    Enabled = CharacterData.WarehouseLocked.V
+                });
+                return;
+            }
+
+            RequestVerificationCode(() =>
+            {
+                CharacterData.WarehouseLocked.V = enabled;
+
+                ActiveConnection?.SendPacket(new SyncWarehouseLockedPacket
+                {
+                    Enabled = CharacterData.WarehouseLocked.V
+                });
+            });
+        }
+
+        public void RequestVerificationCode(Action callback)
+        {
+            TemporalCode = ComputingClass.RandomString(6);
+            OnVerifyCode = callback;
+            MainProcess.AddSystemLog($"Secure random lock code for character: {TemporalCode}");
+            ActiveConnection?.SendPacket(new GameErrorMessagePacket
+            {
+                错误代码 = 292, // Request Code
+            });
+        }
+
+        public void VerifyTaskMessageCode(string code)
+        {
+            if (string.IsNullOrEmpty(TemporalCode) || TemporalCode != code)
+            {
+                // TODO: we need gameerror packet
+                return;
+            }
+
+            SendPacket(new 社交错误提示
+            {
+                错误编号 = 293
+            });
+
+            if (OnVerifyCode != null)
+            {
+                try
+                {
+                    OnVerifyCode();
+                }
+                catch (Exception ex)
+                {
+                    MainProcess.AddSystemLog($"[EXCEPTION] An error ocurred verifing code: {ex.ToString()}");
+                    throw ex;
+                }
+                finally
+                {
+                    OnVerifyCode = null;
+                }
+            }
+        }
+
         public void CompleteQuest(int questId)
         {
             var questToComplete = CharacterData.Quests.FirstOrDefault(x => x.Info.V.Id == questId);
@@ -899,7 +983,7 @@ namespace GameServer.Maps
                     .Where(x => x.CompleteDate.V == DateTime.MinValue)
                     .FirstOrDefault();
 
-                var totalQuests = 5695;
+                var totalQuests = 6176;
                 var bitArray = new BitArray(totalQuests);
 
                 for (var i = 0; i < totalQuests; i++)
@@ -917,7 +1001,7 @@ namespace GameServer.Maps
                 bw.Write(ComputingClass.TimeShift(MainProcess.CurrentTime)); // the last complete quest date??
 
                 bw.Seek(1305, SeekOrigin.Begin);
-                bw.Write(int.MaxValue);
+                bw.Write(new byte[] { 255, 255, 255, 127 });
 
                 bw.Seek(1380, SeekOrigin.Begin);
                 bw.Write(0); // ???
@@ -929,7 +1013,7 @@ namespace GameServer.Maps
                 bw.Write((byte)0); // ???
 
                 bw.Seek(1433, SeekOrigin.Begin);
-                bw.Write(int.MaxValue);
+                bw.Write(new byte[] { 255, 255, 255, 127 });
 
                 bw.Seek(1577, SeekOrigin.Begin);
 
@@ -2621,6 +2705,7 @@ namespace GameServer.Maps
 
         public MonitorDictionary<byte, ItemData> Backpack => CharacterData.Backpack;
         public MonitorDictionary<byte, ItemData> Warehouse => CharacterData.Warehouse;
+        public DataMonitor<bool> WarehouseLocked => CharacterData.WarehouseLocked;
         public MonitorDictionary<byte, ItemData> ExtraBackpack => CharacterData.ExtraBackPack;
         public MonitorDictionary<byte, EquipmentData> Equipment => CharacterData.Equipment;
 
@@ -3120,6 +3205,7 @@ namespace GameServer.Maps
             {
                 this.更新玩家战力();
                 this.RefreshStats();
+                ActiveConnection?.SendRaw(325, 27, new byte[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
             }
         }
 

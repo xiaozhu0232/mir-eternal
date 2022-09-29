@@ -1,15 +1,12 @@
-# Mir Eternal Files
+# Unmaintained project
+I (ElAmO) stop keeping this repository and any other private.
 
+
+# Mir Eternal Files
 
 [![AccountServer Build](https://github.com/Suprcode/mir-eternal/actions/workflows/accountserver-build.yml/badge.svg?branch=main)](https://github.com/Suprcode/mir-eternal/actions/workflows/accountserver-build.yml)
 [![GameServer Build](https://github.com/Suprcode/mir-eternal/actions/workflows/gameserver-build.yml/badge.svg)](https://github.com/Suprcode/mir-eternal/actions/workflows/gameserver-build.yml)
 [![Launcher Build](https://github.com/Suprcode/mir-eternal/actions/workflows/launcher-build.yml/badge.svg)](https://github.com/Suprcode/mir-eternal/actions/workflows/launcher-build.yml)
-
-## Help us to continue maintaining the project
-[![Donate with paypal](docs/paypal-donate-button.png)](https://www.paypal.com/donate/?hosted_button_id=SYTUMJ7742MRC)
-
-### *If you have problems donating, try this other option*:
-http://paypal.me/armifer
 
 ## Info
 
@@ -17,6 +14,8 @@ Originally, these sources were published on LOMCN in the following post:
 https://www.lomcn.org/forum/threads/legend-of-mir-3d-emu-source-code.108580/
 
 In this repository, we have done a refactoring, translation and correction work from the mentioned source.
+
+#### 中国开发和玩家可以加入QQ群:39388776, 防止上当受骗！！！
 
 ## How to start
 
